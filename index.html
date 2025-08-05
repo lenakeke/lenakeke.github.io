@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>網站導覽首頁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    section.category {
+      margin-bottom: 2rem;
+    }
+    section.category h2 {
+      color: var(--primary-color);
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3rem;
+    }
+    ul.page-list {
+      padding-left: 1.5rem;
+    }
+    ul.page-list li {
+      margin: 1rem 0;
+    }
+    ul.page-list li a {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    .desc {
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>GitHub Pages 導覽首頁</h1>
+    <p>以下為分類後的頁面清單：</p>
+  </header>
+
+  <main id="content">
+    <p>⏳ 正在載入頁面清單...</p>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 GitHub Pages 網站導覽</p>
+  </footer>
+
+  <script>
+    fetch('pages.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('無法載入 pages.json');
+        }
+        return response.json();
+      })
+      .then(categories => {
+        const main = document.getElementById('content');
+        main.innerHTML = ''; // 清空 loading 提示
+
+        categories.forEach(category => {
+          const section = document.createElement('section');
+          section.className = 'category';
+
+          const h2 = document.createElement('h2');
+          h2.textContent = category.category;
+
+          const ul = document.createElement('ul');
+          ul.className = 'page-list';
+
+          category.pages.forEach(page => {
+            const li = document.createElement('li');
+
+            const a = document.createElement('a');
+            a.href = page.file;
+            a.textContent = page.title;
+
+            const desc = document.createElement('div');
+            desc.className = 'desc';
+            desc.textContent = page.description || '';
+
+            li.appendChild(a);
+            li.appendChild(desc);
+            ul.appendChild(li);
+          });
+
+          section.appendChild(h2);
+          section.appendChild(ul);
+          main.appendChild(section);
+        });
+      })
+      .catch(error => {
+        const main = document.getElementById('content');
+        main.innerHTML = `<p style="color:red;">❌ 載入失敗：${error.message}</p>`;
+      });
+  </script>
+
+</body>
+</html>

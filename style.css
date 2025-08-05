@@ -1,0 +1,73 @@
+:root {
+    --primary-color: #63518f;
+    --text-color: #333;
+    --bg-color: #ffffff;
+    --highlight-bg: #f9f6ff;
+  }
+  
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.8;
+    margin: 2rem;
+  }
+  
+  header, nav, section, footer {
+    max-width: 960px;
+    margin: auto;
+  }
+  
+  h1, h2, h3 {
+    color: var(--primary-color);
+  }
+  
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  nav {
+    background-color: var(--highlight-bg);
+    border-left: 5px solid var(--primary-color);
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+  }
+  
+  nav ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  nav li {
+    margin: 0.5rem 0;
+  }
+  
+  section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #ccc;
+  }
+  
+  ul {
+    padding-left: 1.5rem;
+  }
+  
+  li::marker {
+    color: var(--primary-color);
+  }
+  
+  footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #888;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+    margin-top: 3rem;
+  }
+  
