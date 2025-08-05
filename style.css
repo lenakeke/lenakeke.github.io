@@ -1,5 +1,6 @@
 :root {
     --primary-color: #63518f;
+    --header-color: #372563;
     --text-color: #333;
     --bg-color: #ffffff;
     --highlight-bg: #f9f6ff;
@@ -19,7 +20,7 @@
   }
   
   h1, h2, h3 {
-    color: var(--primary-color);
+    color: var(--header-color);
   }
   
   a {
@@ -52,6 +53,7 @@
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 1px dashed #ccc;
+    
   }
   
   ul {
@@ -59,10 +61,16 @@
   }
   
   li::marker {
-    color: var(--primary-color);
-  }
-  
-  footer {
+  color: var(--primary-color);
+}
+
+.category {
+  font-weight: bold;
+  font-size: 1.25em;
+  color: var(--header-color);
+}
+
+footer {
     text-align: center;
     font-size: 0.9rem;
     color: #888;
