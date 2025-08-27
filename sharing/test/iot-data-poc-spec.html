@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAP 數據彙整模組儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar for navigation between key project areas: Overview, Data Flow, Architecture, Timeline, and QA. This structure was chosen over a linear document to allow non-linear exploration, enabling stakeholders to quickly access the information most relevant to them. Interactions like clicking tasks to see details in a modal and toggling between data flow diagrams make the dense technical information more digestible and engaging. -->
+    <!-- Visualization & Content Choices: 1. Project Overview: HTML/CSS diagram (Goal: Organize) for a lightweight, quick visual summary. 2. Resource Constraints: Chart.js Bar Chart (Goal: Inform) to clearly visualize hardware limits. 3. Task Management: Interactive HTML Kanban Board (Goal: Organize) to make the project plan explorable and less intimidating than a list. 4. Test Coverage: Chart.js Donut Chart (Goal: Inform) as it's the standard for showing percentage-based goals. All choices avoid SVG/Mermaid and prioritize interactivity and clarity. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d3d3d;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #eaddd7;
+            color: #7b5b4a;
+            font-weight: 700;
+        }
+        .task-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <!-- Sidebar Navigation -->
+    <nav class="w-full md:w-64 bg-[#efebe9] p-4 md:p-6 flex-shrink-0">
+        <h1 class="text-2xl font-bold text-[#7b5b4a] mb-8">EAP 數據模組</h1>
+        <ul class="space-y-2">
+            <li><a href="#overview" class="nav-link block p-3 rounded-lg active">專案總覽</a></li>
+            <li><a href="#data-flow" class="nav-link block p-3 rounded-lg">數據流程</a></li>
+            <li><a href="#architecture" class="nav-link block p-3 rounded-lg">系統架構與限制</a></li>
+            <li><a href="#tasks" class="nav-link block p-3 rounded-lg">任務時程</a></li>
+            <li><a href="#qa" class="nav-link block p-3 rounded-lg">測試與品質</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 sm:p-6 md:p-10 overflow-y-auto">
+
+        <!-- Section: Overview -->
+        <section id="overview" class="mb-16">
+            <h2 class="text-3xl font-bold mb-4 text-[#a1887f]">專案總覽</h2>
+            <p class="mb-6 text-gray-600">本節提供 EAP 數據彙整模組 POC 的背景、目標與範疇。此模組旨在將各產線的機聯數據進行彙整、滾算並持久化，以支援廠級即時應用與未來的數據商品化。</p>
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="text-xl font-bold mb-4 text-center text-[#7b5b4a]">核心數據流程</h3>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <span class="text-2xl">🏭</span>
+                        <p class="font-semibold mt-1">產線數據源</p>
+                        <p class="text-sm text-gray-500">(Line Managers)</p>
+                    </div>
+                    <div class="text-3xl text-gray-400 font-light">→</div>
+                    <div class="p-4 bg-green-50 rounded-lg">
+                        <span class="text-2xl">🔧</span>
+                        <p class="font-semibold mt-1">EAP 數據模組</p>
+                        <p class="text-sm text-gray-500">(Data Fetcher)</p>
+                    </div>
+                    <div class="text-3xl text-gray-400 font-light">→</div>
+                    <div class="flex flex-col space-y-2">
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                             <span class="text-2xl">💾</span>
+                            <p class="font-semibold mt-1">即時數據庫</p>
+                            <p class="text-sm text-gray-500">(ClickHouse)</p>
+                        </div>
+                        <div class="p-4 bg-yellow-50 rounded-lg">
+                             <span class="text-2xl">📦</span>
+                            <p class="font-semibold mt-1">長期儲存</p>
+                            <p class="text-sm text-gray-500">(S3)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Data Flow -->
+        <section id="data-flow" class="mb-16 hidden">
+            <h2 class="text-3xl font-bold mb-4 text-[#a1887f]">數據流程</h2>
+            <p class="mb-6 text-gray-600">本節詳細說明數據從 Kafka 被擷取後，如何被持久化到不同的目標儲存體。您可以點擊下方的按鈕來切換查看不同的數據持久化路徑。</p>
+            <div class="flex justify-center mb-6 space-x-2">
+                <button id="flow-btn-rmdb" class="px-4 py-2 bg-[#eaddd7] text-[#7b5b4a] font-semibold rounded-lg shadow-sm">Kafka → RMDB</button>
+                <button id="flow-btn-s3" class="px-4 py-2 bg-white text-gray-600 font-semibold rounded-lg shadow-sm">Kafka → S3</button>
+            </div>
+            <div id="flow-content-rmdb" class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="text-xl font-bold mb-4 text-[#7b5b4a]">持久化至 RMDB (ClickHouse)</h3>
+                <p class="mb-4">此流程專為需要快速查詢的即時數據設計，目標是提供 4 秒內的數據查詢能力。</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li>實作 Kafka 消費者，從指定 Topic 讀取數據。</li>
+                    <li>將接收的串流數據以正確的格式寫入 ClickHouse。</li>
+                    <li>確保數據寫入速度滿足即時性需求，且無明顯數據遺失。</li>
+                </ul>
+            </div>
+            <div id="flow-content-s3" class="bg-white p-6 rounded-xl shadow-sm hidden">
+                <h3 class="text-xl font-bold mb-4 text-[#7b5b4a]">持久化至 S3</h3>
+                <p class="mb-4">此流程用於數據的長期儲存與備份，以支援未來的數據分析或商品化需求。</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li>實作數據緩衝機制，將數據批次寫入 S3。</li>
+                    <li>數據以批次形式（如每 5 分鐘或 1GB）打包。</li>
+                    <li>批次數據以 Parquet 格式上傳，並依規範命名。</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section: Architecture & Constraints -->
+        <section id="architecture" class="mb-16 hidden">
+            <h2 class="text-3xl font-bold mb-4 text-[#a1887f]">系統架構與限制</h2>
+            <p class="mb-6 text-gray-600">此專案需要在資源有限的基礎設施上運行。本節說明了主要的硬體限制與對應的系統優化策略，以確保模組的穩定性與效能。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <h3 class="text-xl font-bold mb-4 text-[#7b5b4a]">硬體限制</h3>
+                    <div class="chart-container">
+                        <canvas id="constraintsChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm">
+                    <h3 class="text-xl font-bold mb-4 text-[#7b5b4a]">穩定性強化策略</h3>
+                     <ul class="list-none space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <div>
+                                <h4 class="font-semibold">自動化錯誤處理</h4>
+                                <p class="text-sm text-gray-500">為數據寫入失敗（如連線中斷）實作自動重試邏輯。</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 mt-1">✓</span>
+                            <div>
+                                <h4 class="font-semibold">配置服務化</h4>
+                                <p class="text-sm text-gray-500">將所有配置抽離，不需修改程式碼即可切換環境。</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Tasks -->
+        <section id="tasks" class="mb-16 hidden">
+            <h2 class="text-3xl font-bold mb-4 text-[#a1887f]">任務時程</h2>
+            <p class="mb-6 text-gray-600">專案被分解為四個主要階段。點擊下方的任務卡片可以查看每個階段的詳細描述與驗收標準。</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Task 1 -->
+                <div class="task-card bg-white p-6 rounded-xl shadow-sm cursor-pointer" data-task="1">
+                    <p class="text-sm font-bold text-blue-500">Task 1</p>
+                    <h3 class="text-lg font-bold mt-2">環境建置與設定</h3>
+                </div>
+                <!-- Task 2 -->
+                <div class="task-card bg-white p-6 rounded-xl shadow-sm cursor-pointer" data-task="2">
+                    <p class="text-sm font-bold text-green-500">Task 2</p>
+                    <h3 class="text-lg font-bold mt-2">核心功能開發</h3>
+                </div>
+                <!-- Task 3 -->
+                <div class="task-card bg-white p-6 rounded-xl shadow-sm cursor-pointer" data-task="3">
+                    <p class="text-sm font-bold text-yellow-500">Task 3</p>
+                    <h3 class="text-lg font-bold mt-2">系統優化與強化</h3>
+                </div>
+                <!-- Task 4 -->
+                <div class="task-card bg-white p-6 rounded-xl shadow-sm cursor-pointer" data-task="4">
+                    <p class="text-sm font-bold text-purple-500">Task 4</p>
+                    <h3 class="text-lg font-bold mt-2">測試與程式碼審查</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: QA -->
+        <section id="qa" class="hidden">
+            <h2 class="text-3xl font-bold mb-4 text-[#a1887f]">測試與品質</h2>
+            <p class="mb-6 text-gray-600">品質是此專案的關鍵。我們將透過撰寫單元測試與進行程式碼審查來確保程式碼的健壯性與可維護性。</p>
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h3 class="text-xl font-bold mb-4 text-[#7b5b4a]">單元測試覆蓋率目標</h3>
+                <div class="chart-container h-48 sm:h-64">
+                    <canvas id="qaChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal -->
+    <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <h3 id="modal-title" class="text-2xl font-bold text-[#7b5b4a]"></h3>
+            </div>
+            <div class="p-6">
+                <h4 class="font-bold text-lg mb-2">任務描述</h4>
+                <p id="modal-description" class="mb-6 text-gray-600"></p>
+                <h4 class="font-bold text-lg mb-2">驗收標準</h4>
+                <ul id="modal-criteria" class="list-disc list-inside space-y-2 text-gray-700"></ul>
+            </div>
+            <div class="p-4 bg-gray-50 text-right">
+                <button id="modal-close" class="px-4 py-2 bg-[#eaddd7] text-[#7b5b4a] font-semibold rounded-lg">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Data for the application
+            const taskData = {
+                '1': {
+                    title: 'Task 1: 環境建置與專案設定',
+                    description: '設定開發環境並初始化專案，建立符合專案需求的程式碼與文件架構。',
+                    criteria: [
+                        '專案資料夾結構已建立，並包含 `data_fetcher`, `config`, `tests` 等核心目錄。',
+                        '程式碼版本控制 (Git) 已初始化，且首次提交已推送至遠端儲存庫。',
+                        '專案依賴 (如 Kafka client, ClickHouse client, AWS SDK 等) 已安裝完成，並能成功編譯或執行基本的連線測試。'
+                    ]
+                },
+                '2': {
+                    title: 'Task 2: 核心功能開發 - 數據持久化',
+                    description: '實作 EAP Data Fetcher Component，負責將數據從來源（Kafka, RabbitMQ）持久化到目標儲存體（RMDB, S3）。',
+                    criteria: [
+                        '成功從 Kafka 接收串流數據並寫入 ClickHouse。',
+                        '能將接收的數據以正確的格式 (schema) 寫入 ClickHouse。',
+                        '數據寫入速度能滿足即時性需求，且沒有明顯的數據遺失。',
+                        '實作數據緩衝機制，將數據批次以 Parquet 格式寫入 S3。',
+                        'S3 上的檔案命名符合規範。'
+                    ]
+                },
+                '3': {
+                    title: 'Task 3: 系統優化與穩定性強化',
+                    description: '針對低規格硬體環境進行模組優化，並實作錯誤處理機制以提高系統穩定性。',
+                    criteria: [
+                        '在模擬的高負載情境下，模組的 RAM 使用量低於 16GB，CPU 核心數不超過 8 核。',
+                        '當發生可恢復性錯誤時，系統能自動重試並成功完成任務。',
+                        '不需修改程式碼，僅透過調整外部配置文件即可切換數據源或目標儲存體。'
+                    ]
+                },
+                '4': {
+                    title: 'Task 4: 程式碼審查與單元測試',
+                    description: '為主要功能撰寫單元測試，並在程式碼審查中根據回饋進行調整。',
+                    criteria: [
+                        '為數據讀取、處理與寫入等核心邏輯撰寫單元測試。',
+                        '所有單元測試都能成功通過，且測試覆蓋率至少達到 80%。',
+                        '發起 Pull Request (PR) 並與團隊成員討論程式碼。',
+                        'PR 已被審核者核准並合併 (merged)。'
+                    ]
+                }
+            };
+
+            // Navigation Logic
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            function updateActiveLink(targetId) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${targetId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            function showSection(targetId) {
+                sections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                });
+                updateActiveLink(targetId);
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    showSection(targetId);
+                    window.location.hash = targetId;
+                });
+            });
+            
+            // Handle initial page load with hash
+            const initialHash = window.location.hash.substring(1);
+            if (initialHash) {
+                showSection(initialHash);
+            }
+
+
+            // Data Flow Toggles
+            const flowBtnRmdb = document.getElementById('flow-btn-rmdb');
+            const flowBtnS3 = document.getElementById('flow-btn-s3');
+            const flowContentRmdb = document.getElementById('flow-content-rmdb');
+            const flowContentS3 = document.getElementById('flow-content-s3');
+
+            flowBtnRmdb.addEventListener('click', () => {
+                flowContentRmdb.classList.remove('hidden');
+                flowContentS3.classList.add('hidden');
+                flowBtnRmdb.classList.add('bg-[#eaddd7]', 'text-[#7b5b4a]');
+                flowBtnRmdb.classList.remove('bg-white', 'text-gray-600');
+                flowBtnS3.classList.add('bg-white', 'text-gray-600');
+                flowBtnS3.classList.remove('bg-[#eaddd7]', 'text-[#7b5b4a]');
+            });
+
+            flowBtnS3.addEventListener('click', () => {
+                flowContentS3.classList.remove('hidden');
+                flowContentRmdb.classList.add('hidden');
+                flowBtnS3.classList.add('bg-[#eaddd7]', 'text-[#7b5b4a]');
+                flowBtnS3.classList.remove('bg-white', 'text-gray-600');
+                flowBtnRmdb.classList.add('bg-white', 'text-gray-600');
+                flowBtnRmdb.classList.remove('bg-[#eaddd7]', 'text-[#7b5b4a]');
+            });
+
+            // Modal Logic
+            const modal = document.getElementById('task-modal');
+            const modalClose = document.getElementById('modal-close');
+            const taskCards = document.querySelectorAll('.task-card');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalCriteria = document.getElementById('modal-criteria');
+
+            taskCards.forEach(card => {
+                card.addEventListener('click', function () {
+                    const taskId = this.getAttribute('data-task');
+                    const data = taskData[taskId];
+                    modalTitle.textContent = data.title;
+                    modalDescription.textContent = data.description;
+                    modalCriteria.innerHTML = '';
+                    data.criteria.forEach(item => {
+                        const li = document.createElement('li');
+                        li.textContent = item;
+                        modalCriteria.appendChild(li);
+                    });
+                    modal.classList.remove('hidden');
+                });
+            });
+
+            modalClose.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+
+            // Chart.js Implementations
+            // Constraints Chart
+            const constraintsCtx = document.getElementById('constraintsChart').getContext('2d');
+            new Chart(constraintsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['RAM (GB)', 'CPU (Cores)'],
+                    datasets: [{
+                        label: '硬體限制',
+                        data: [16, 8],
+                        backgroundColor: ['rgba(161, 136, 127, 0.6)', 'rgba(234, 221, 215, 0.8)'],
+                        borderColor: ['rgba(161, 136, 127, 1)', 'rgba(234, 221, 215, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: '容量' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: '資源上限 (<)' }
+                    }
+                }
+            });
+
+            // QA Chart
+            const qaCtx = document.getElementById('qaChart').getContext('2d');
+            new Chart(qaCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已覆蓋', '未覆蓋'],
+                    datasets: [{
+                        data: [80, 20],
+                        backgroundColor: ['rgba(123, 91, 74, 0.8)', 'rgba(239, 235, 233, 1)'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}%` } },
+                        title: { display: true, text: '目標: 80% 程式碼覆蓋率' }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
