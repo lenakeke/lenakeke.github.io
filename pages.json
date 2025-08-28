@@ -16,6 +16,11 @@
           "title": "IOT 數據彙整模組",
           "file": "sharing/test/iot-data-poc-spec.html",
           "description": "IOT 數據彙整模組專案的概念驗證 (POC) 儀表板。提供專案背景、數據流程、硬體限制、任務列表與品質目標等資訊，專為新進軟體工程師設計。"
+        },
+        {
+          "title": "TDD 與 AI 融合：互動式報告",
+          "file": "sharing/tdd-ai-report.html",
+          "description": "測試驅動開發 (TDD) 在 AI 時代的演進與轉型。"
         }
       ]
     }
