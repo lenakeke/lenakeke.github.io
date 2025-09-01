@@ -21,6 +21,11 @@
           "title": "TDD 與 AI 融合：互動式報告",
           "file": "sharing/tdd-ai-report.html",
           "description": "測試驅動開發 (TDD) 在 AI 時代的演進與轉型。"
+        },
+        {
+          "title": "內部開發者平台 (IDP) 解析",
+          "file": "sharing/idp-infographic.html",
+          "description": "內部開發者平台（IDP）的核心概念與目標。"
         }
       ]
     }
