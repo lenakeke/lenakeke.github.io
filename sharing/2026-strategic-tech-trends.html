@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 頂級策略科技趨勢：聚焦 AI 原生開發平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Warm Sand & Tech Teal -->
+    <!-- Application Structure Plan: This SPA uses a top-down narrative flow. It starts with a broad overview of 2026 trends to establish context, then funnels the user specifically into the requested topic: "AI-Native Development Platforms" as the evolution of the "Internal Developer Platform (IDP)". The structure uses a sticky navigation for quick access, interactive tabs for deep-dive content without overwhelming the screen, and side-by-side chart comparisons to clearly illustrate the value proposition of the new technology versus the old. This approach ensures the user understands the macro trend before exploring the micro details of implementation and impact. -->
+    <!-- Visualization & Content Choices: 
+         1. Goal: Contextualize trends -> Method: Grid layout with interactive hover states (HTML/CSS) -> Justification: Allows quick scanning of multiple trends.
+         2. Goal: Compare Traditional IDP vs AI-Native Platform -> Method: Radar Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips, legend click to toggle -> Justification: Best for multivariate comparison across capabilities (Speed, Quality, etc.). NO SVG used.
+         3. Goal: Show Productivity Impact over time -> Method: Bar/Line Combo Chart (Chart.js/Canvas) -> Justification: Clearly shows quantitative growth projections. NO SVG used.
+         4. Goal: Detail Platform Features -> Method: Interactive Tabs (HTML/JS) -> Justification: Organizes dense textual and conceptual information logically. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        /* Base styling and typography */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #FDFBF7; /* Warm Sand background */
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* Glassmorphism utilities for modern feel */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Mandatory Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Constrain max width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Interactive Element Transitions */
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active { background-color: #0d9488; color: white; border-color: #0d9488; }
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .emoji-icon { font-size: 1.5rem; line-height: 1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Sticky Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="emoji-icon mr-2">📊</span>
+                    <span class="font-bold text-xl text-slate-800">TechTrends 2026</span>
+                </div>
+                <div class="flex items-center space-x-4 md:space-x-8 text-sm font-medium">
+                    <a href="#overview" class="text-slate-600 hover:text-teal-600 transition-colors">宏觀趨勢</a>
+                    <a href="#idp-evolution" class="text-slate-600 hover:text-teal-600 transition-colors">IDP 演進</a>
+                    <a href="#platform-analysis" class="text-slate-600 hover:text-teal-600 transition-colors">平台深度分析</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">
+            2026 頂級策略科技趨勢：<br class="hidden md:block"/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">聚焦 AI 原生開發平台</span>
+        </h1>
+        <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+            從傳統的內部開發者平台 (IDP) 轉型至 AI 賦能的生態系統。這份互動報告將帶您了解 2026 年軟體工程的未來樣貌，以及 AI 如何重塑開發者體驗。
+        </p>
+    </header>
+
+    <!-- Section 1: Macro Trends Overview -->
+    <section id="overview" class="py-12 bg-white border-t border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">2026 關鍵科技趨勢概覽</h2>
+                <p class="text-slate-600 max-w-3xl">
+                    在深入探討開發平台之前，我們必須了解整體的科技背景。2026 年的趨勢強調「保護投資」、「賦能創作者」以及「傳遞價值」。其中，**AI 原生開發**被視為推動企業數位轉型的核心引擎。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Trend Card 1 -->
+                <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                        <span class="emoji-icon">🛡️</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI 信任、風險與安全管理 (TRiSM)</h3>
+                    <p class="text-sm text-slate-600">隨著 AI 普及，建立對 AI 模型的信任、確保資料隱私及防範惡意攻擊成為企業首要任務。</p>
+                </div>
+                <!-- Trend Card 2 (Highlight) -->
+                <div class="p-6 rounded-2xl bg-teal-50 border border-teal-200 shadow-md transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-teal-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">本次研究焦點</div>
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center mb-4">
+                        <span class="emoji-icon">⚡</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-teal-900 mb-2">AI 原生開發 (AI-Native Development)</h3>
+                    <p class="text-sm text-teal-700">整合 AI 增強編碼、自動化重構及智慧平台工程，大幅縮短軟體交付生命週期並提升程式碼品質。</p>
+                </div>
+                <!-- Trend Card 3 -->
+                <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
+                        <span class="emoji-icon">🤖</span>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">機器客群 (Machine Customers)</h3>
+                    <p class="text-sm text-slate-600">非人類的經濟行為者（如物聯網設備）將能自主進行採購與談判，重塑商務模式與平台 API 架構。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: IDP Evolution -->
+    <section id="idp-evolution" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">從 IDP 到 AI 原生開發平台</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">
+                    內部開發者平台 (Internal Developer Platform, IDP) 長期以來致力於減少開發者的「認知負荷」。在 2026 年，結合大型語言模型 (LLM) 和機器學習技術，傳統 IDP 正進化為具備主動感知與生成能力的「AI 原生開發平台」。
+                </p>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <!-- Left: Interactive Concept Explorer -->
+                    <div class="p-8 lg:p-12 bg-slate-800 text-white">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center">
+                            <span class="emoji-icon mr-3">🔍</span> 核心能力範式轉移
+                        </h3>
+                        
+                        <!-- Concept Interactions -->
+                        <div class="space-y-4">
+                            <button onclick="updateComparison('automation')" class="w-full text-left p-4 rounded-xl border border-slate-600 hover:bg-slate-700 transition focus:outline-none flex justify-between items-center group">
+                                <div>
+                                    <div class="font-semibold text-lg text-teal-300">基礎設施配置</div>
+                                    <div class="text-sm text-slate-400 mt-1">基礎設施即程式碼 (IaC) 的演進</div>
+                                </div>
+                                <span class="emoji-icon opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition">➡️</span>
+                            </button>
+                            
+                            <button onclick="updateComparison('coding')" class="w-full text-left p-4 rounded-xl border border-slate-600 hover:bg-slate-700 transition focus:outline-none flex justify-between items-center group">
+                                <div>
+                                    <div class="font-semibold text-lg text-teal-300">編碼與測試</div>
+                                    <div class="text-sm text-slate-400 mt-1">從 IDE 輔助到全生命週期參與</div>
+                                </div>
+                                <span class="emoji-icon opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition">➡️</span>
+                            </button>
+
+                            <button onclick="updateComparison('governance')" class="w-full text-left p-4 rounded-xl border border-slate-600 hover:bg-slate-700 transition focus:outline-none flex justify-between items-center group">
+                                <div>
+                                    <div class="font-semibold text-lg text-teal-300">架構治理</div>
+                                    <div class="text-sm text-slate-400 mt-1">合規性與標準化的執行方式</div>
+                                </div>
+                                <span class="emoji-icon opacity-50 group-hover:opacity-100 group-hover:translate-x-1 transition">➡️</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Dynamic Content Display -->
+                    <div class="p-8 lg:p-12 flex flex-col justify-center" id="comparison-display">
+                        <div class="text-center text-slate-400 flex flex-col items-center">
+                            <span class="emoji-icon text-4xl mb-4">👈</span>
+                            <p>請點擊左側項目，查看傳統 IDP 與 AI 原生開發平台的具體差異分析。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Data & Impact Analysis -->
+    <section id="platform-analysis" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10 text-center">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4">平台效能與價值數據分析</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">
+                    透過量化數據，我們可以清晰看到導入 AI 原生開發平台後，在工程效率、代碼品質及企業上市時間 (Time-to-Market) 上帶來的顯著影響。以下圖表展示了預測的模型表現與效益評估。
+                </p>
+            </div>
+
+            <!-- Tab Navigation for Charts -->
+            <div class="flex justify-center space-x-2 mb-8">
+                <button onclick="switchTab('radar-tab')" id="btn-radar-tab" class="tab-btn active px-6 py-2 rounded-full border border-slate-300 font-medium text-slate-600">能力維度對比</button>
+                <button onclick="switchTab('bar-tab')" id="btn-bar-tab" class="tab-btn px-6 py-2 rounded-full border border-slate-300 font-medium text-slate-600">生產力成長預測</button>
+            </div>
+
+            <!-- Tab Content 1: Radar Chart (Capabilities) -->
+            <div id="radar-tab" class="tab-content active">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xl font-semibold text-center mb-6">平台綜合能力評估 (評分 1-100)</h3>
+                    <div class="chart-container">
+                        <canvas id="capabilitiesRadarChart"></canvas>
+                    </div>
+                    <div class="mt-6 text-sm text-slate-600 bg-white p-4 rounded-lg border border-slate-200">
+                        <strong>洞察：</strong> AI 原生平台在「代碼自動生成」與「智慧漏洞修復」方面表現出壓倒性優勢，填補了傳統 IDP 主要依賴人工介入的短板。
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Bar Chart (Productivity) -->
+            <div id="bar-tab" class="tab-content">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xl font-semibold text-center mb-6">開發者平均生產力提升預測 (2023-2027)</h3>
+                    <div class="chart-container">
+                        <canvas id="productivityBarChart"></canvas>
+                    </div>
+                    <div class="mt-6 text-sm text-slate-600 bg-white p-4 rounded-lg border border-slate-200">
+                        <strong>洞察：</strong> 隨著 2024-2025 年 AI 工具整合至平台底層，預計 2026 年生產力將迎來陡峭的成長曲線，開發者將 40% 以上的精力從重覆性勞動轉移至創新架構設計。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section class="py-16 bg-slate-900 text-white text-center">
+        <div class="max-w-4xl mx-auto px-4">
+            <span class="emoji-icon text-5xl mb-6 block">🚀</span>
+            <h2 class="text-3xl font-bold mb-6">擁抱 AI 原生開發的未來</h2>
+            <p class="text-lg text-slate-300 mb-8">
+                2026 年，"AI-Native Development Platforms" 將不再是可選項，而是企業保持技術競爭力的基礎設施。從現在開始評估並升級您的內部開發者平台 (IDP)，將是邁向未來軟體工程的關鍵一步。
+            </p>
+            <button onclick="window.scrollTo(0,0)" class="px-8 py-3 bg-teal-500 hover:bg-teal-400 text-white rounded-full font-bold transition-colors shadow-lg shadow-teal-500/30">
+                重回頂部重新探索
+            </button>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 py-6 text-center text-slate-500 text-sm">
+        <p>© 2026 Tech Trends Interactive Report Demo. Generated for analytical visualization.</p>
+    </footer>
+
+    <!-- Interactive Logic & Chart Configurations -->
+    <script>
+        // Data content for the interactive Concept Explorer
+        const comparisonData = {
+            'automation': {
+                title: '基礎設施配置 (Infrastructure Setup)',
+                traditional: {
+                    label: '傳統 IDP',
+                    text: '依賴靜態的 Terraform/Helm 模板。開發者需透過 UI 填寫表單，由平台自動執行 CI/CD pipeline 部署。若需求超出模板，仍需平台工程師介入修改 IaC。',
+                    icon: '⚙️'
+                },
+                ainative: {
+                    label: 'AI 原生開發平台',
+                    text: '採用「意圖驅動 (Intent-based)」配置。開發者用自然語言描述需求（例："需要一個能處理高併發的微服務環境"），AI 平台自動推導架構、生成對應的 IaC 代碼並預測潛在成本與風險。',
+                    icon: '🪄'
+                }
+            },
+            'coding': {
+                title: '編碼與測試 (Coding & Testing)',
+                traditional: {
+                    label: '傳統 IDP',
+                    text: '提供代碼庫模板 (Golden Paths) 和內建的靜態代碼掃描工具。開發者依循規範手動編寫業務邏輯和單元測試。',
+                    icon: '📝'
+                },
+                ainative: {
+                    label: 'AI 原生開發平台',
+                    text: '深度整合 AI 結對程式設計 (AI Pair Programming)。平台能根據企業內部 API 文件自動生成業務邏輯，甚至在編碼階段自動生成邊界測試案例，並在背景執行自動化重構建議。',
+                    icon: '🧠'
+                }
+            },
+            'governance': {
+                title: '架構治理 (Architecture Governance)',
+                traditional: {
+                    label: '傳統 IDP',
+                    text: '透過 CI 流程中的門檻 (Gates) 進行事後攔截。若不符安全規範或架構準則，部署將失敗，開發者需查閱日誌修正。',
+                    icon: '🚧'
+                },
+                ainative: {
+                    label: 'AI 原生開發平台',
+                    text: '實現「護欄即代碼 (Guardrails as Code)」的動態引導。AI 代理會分析架構演進趨勢，在開發者設計 API 或選用資料庫時，即時給出符合企業合規與資安要求的最佳實踐建議，防患於未然。',
+                    icon: '🛡️'
+                }
+            }
+        };
+
+        // Function to update the Comparison Display area
+        function updateComparison(key) {
+            const data = comparisonData[key];
+            const display = document.getElementById('comparison-display');
+            
+            // Fade out effect
+            display.style.opacity = 0;
+            
+            setTimeout(() => {
+                display.innerHTML = `
+                    <h4 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-2">${data.title}</h4>
+                    
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 p-5 rounded-xl border-l-4 border-slate-400 relative">
+                            <span class="absolute top-4 right-4 text-2xl opacity-50">${data.traditional.icon}</span>
+                            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">${data.traditional.label}</div>
+                            <p class="text-slate-700 leading-relaxed">${data.traditional.text}</p>
+                        </div>
+
+                        <div class="flex justify-center my-2">
+                            <span class="emoji-icon text-slate-300 transform rotate-90 md:rotate-0 md:hidden">➡️</span>
+                            <span class="emoji-icon text-slate-300 hidden md:block">⬇️ 進化 ⬇️</span>
+                        </div>
+
+                        <div class="bg-teal-50 p-5 rounded-xl border-l-4 border-teal-500 shadow-md relative">
+                            <span class="absolute top-4 right-4 text-2xl opacity-50">${data.ainative.icon}</span>
+                            <div class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-2 flex items-center">
+                                ${data.ainative.label} <span class="ml-2 flex h-2 w-2 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span></span>
+                            </div>
+                            <p class="text-teal-900 leading-relaxed font-medium">${data.ainative.text}</p>
+                        </div>
+                    </div>
+                `;
+                // Fade in effect
+                display.style.transition = 'opacity 0.4s ease-in-out';
+                display.style.opacity = 1;
+            }, 200);
+        }
+
+        // Tab Switching Logic for Charts
+        function switchTab(tabId) {
+            // Remove active classes
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('bg-teal-600', 'text-white', 'border-teal-600'); // Clean up active styles
+            });
+
+            // Add active classes to selected
+            document.getElementById(tabId).classList.add('active');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            activeBtn.classList.add('active');
+            
+            // Re-render chart to handle resize issues if tab was hidden
+            if(tabId === 'radar-tab') radarChart.update();
+            if(tabId === 'bar-tab') productivityChart.update();
+        }
+
+        // Initialize Chart.js configuration globally
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; // slate-500
+
+        let radarChart, productivityChart;
+
+        window.onload = function() {
+            // Pre-load the first comparison concept
+            updateComparison('coding');
+
+            // --- Radar Chart: Capabilities Comparison ---
+            const ctxRadar = document.getElementById('capabilitiesRadarChart').getContext('2d');
+            radarChart = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        ['代碼生成', '與自動補全'], 
+                        ['環境配置', '自動化 (IaC)'], 
+                        ['架構與', '設計建議'], 
+                        ['資安弱點', '自動修復'], 
+                        ['測試案例', '智慧覆蓋']
+                    ],
+                    datasets: [{
+                        label: '傳統 IDP (2023基準)',
+                        data: [20, 75, 10, 30, 40],
+                        fill: true,
+                        backgroundColor: 'rgba(148, 163, 184, 0.2)', // slate-400
+                        borderColor: 'rgb(148, 163, 184)',
+                        pointBackgroundColor: 'rgb(148, 163, 184)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(148, 163, 184)'
+                    }, {
+                        label: 'AI 原生開發平台 (2026預測)',
+                        data: [90, 85, 80, 85, 95],
+                        fill: true,
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)', // teal-600
+                        borderColor: 'rgb(13, 148, 136)',
+                        pointBackgroundColor: 'rgb(13, 148, 136)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(13, 148, 136)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for container responsiveness
+                    elements: { line: { borderWidth: 3 } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0,0,0,0.1)' },
+                            grid: { color: 'rgba(0,0,0,0.1)' },
+                            pointLabels: { font: { size: 12, weight: 'bold' }, color: '#334155' },
+                            ticks: { backdropColor: 'transparent', stepSize: 20, max: 100, min: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 13 }
+                        }
+                    }
+                }
+            });
+
+            // --- Bar/Line Combo Chart: Productivity Projection ---
+            const ctxBar = document.getElementById('productivityBarChart').getContext('2d');
+            productivityChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['2023', '2024', '2025', '2026 (預測)', '2027 (預測)'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'AI 平台採用率 (%)',
+                            data: [5, 15, 35, 70, 90],
+                            borderColor: '#f59e0b', // amber-500
+                            backgroundColor: '#f59e0b',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            yAxisID: 'y1',
+                            fill: false
+                        },
+                        {
+                            type: 'bar',
+                            label: '平均開發者效率指數',
+                            data: [100, 105, 120, 160, 200], // Base 100
+                            backgroundColor: 'rgba(14, 165, 233, 0.8)', // sky-500
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Critical for container responsiveness
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: {
+                            type: 'linear', display: true, position: 'left',
+                            title: { display: true, text: '效率指數 (2023 = 100)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'right',
+                            title: { display: true, text: '企業採用率 (%)' },
+                            grid: { drawOnChartArea: false },
+                            max: 100, min: 0
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
